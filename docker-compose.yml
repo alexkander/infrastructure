@@ -2,6 +2,7 @@ version: "3"
 services:
   nginx:
     restart: always # because it is routing traffic to our entire server
+    container_name: 'nginx-server'
     image: nginx
     ports:
       - '80:80'
@@ -37,12 +38,12 @@ services:
   phpmyadmin:
     image: phpmyadmin/phpmyadmin:4.7
     restart: always
+    container_name: 'phpmyadmin-client'
     depends_on:
       - mysqldb
-    ports:
-      - 8001:80
     environment:
       - PMA_HOST=mysql-db
+      - PMA_ABSOLUTE_URI=https://pma.localhost/
     networks:
       - private-network
 
