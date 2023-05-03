@@ -1,0 +1,9 @@
+# Environment variables
+/env
+
+# Mongo db volume data for persistence storage
+/mongo/mongo-volume/*
+/mysql/mysql-volume/*
+
+# Idea IDE configs
+.idea

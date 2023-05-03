@@ -1,0 +1,36 @@
+version: "3"
+services:
+  mongo:
+    image: 'mongo'
+    restart: always
+    container_name: 'mongo-db'
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: rootpass
+    ports:
+      - '27017-27019:27017-27019'
+    volumes: 
+      - ./mongo/mongo-volume:/data/db
+
+  mysql:
+    image: mariadb:10
+    restart: always
+    container_name: 'mysql-db'
+    command:
+      ["--character-set-server=utf8", "--collation-server=utf8_unicode_ci"]
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+    volumes:
+      - ./mysql/mysql-volume:/var/lib/mysql
+    ports:
+      - 3306:3306
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin:4.7
+    restart: always
+    depends_on:
+      - mysql
+    ports:
+      - 8001:80
+    environment:
+      - PMA_HOST=mysql-db
