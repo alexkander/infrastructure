@@ -17,7 +17,7 @@ services:
     ports:
       - '27017-27019:27017-27019'
     volumes: 
-      - ../mongo-volume:/data/db
+      - ../.mongo-volume:/data/db
     networks:
       - private-network
 
