@@ -17,5 +17,5 @@ jobs:
     - name: Docker compose up
       run: docker compose up --build --remove-orphans -d
     - name: Configuring nginx
-      run: docker container cp ./phpmyadmin/phpmyadmin.conf nginx-server:/etc/nginx/conf.d/
+      run: docker container cp ./phpmyadmin/phpmyadmin.conf nginx-server:/etc/nginx/sites/
     - run: docker container exec nginx-server nginx -s reload
