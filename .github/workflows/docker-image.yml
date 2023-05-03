@@ -13,8 +13,8 @@ jobs:
     runs-on: self-hosted
 
     steps:
-    - name: Docker compose down
-      run: docker compose down -v
     - uses: actions/checkout@v3
+    # - name: Docker compose down
+    #   run: docker compose down -v
     - name: Docker compose up
       run: docker compose up --build --remove-orphans -d
