@@ -1,5 +1,12 @@
 version: "3"
 services:
+  nginx:
+    restart: always # because it is routing traffic to our entire server
+    image: nginx
+    ports:
+      - '80:80'
+    networks:
+      - private-network
   mongodb:
     image: 'mongo'
     restart: always
@@ -38,7 +45,6 @@ services:
       - PMA_HOST=mysql-db
     networks:
       - private-network
-    
 
 networks:
   private-network:
