@@ -1,0 +1,68 @@
+version: "3.9"
+services:
+
+  traefik:
+    image: traefik:v2.5
+    ports:
+      - "80:80"
+      - "443:443"
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "$REPO_DIR/traefik.yml:/etc/traefik/traefik.yml"
+      - "$REPO_DIR/traefik/acme:/acme"
+    networks:
+      - traefik_network
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+    labels:
+      - "traefik.enable=false"
+
+  mysqldb:
+    image: mariadb:10
+    restart: always
+    command:
+      ["--character-set-server=utf8", "--collation-server=utf8_unicode_ci"]
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpass
+    volumes:
+      - "$REPO_DIR/mysqldb/data:/var/lib/mysql"
+    networks:
+      - traefik_network
+    labels:
+      - "traefik.enable=false"
+
+  phpmyadminClient:
+    image: phpmyadmin/phpmyadmin:4.7
+    restart: always
+    depends_on:
+      - mysqldb
+    environment:
+      - PMA_HOST=mysqldb
+    networks:
+      - traefik_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.phpmyadminClient.rule=Host(`phpmyadmin.alexkander.xyz`)"
+      - "traefik.http.routers.phpmyadminClient.entrypoints=web, websecure"
+      - "traefik.http.routers.phpmyadminClient.tls=true"
+      - "traefik.http.routers.phpmyadminClient.tls.certresolver=production"
+      - "traefik.docker.network=traefik_network"
+
+  whoami:
+    image: containous/whoami
+    networks:
+      - traefik_network
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.alexkander.xyz`)"
+      - "traefik.http.routers.whoami.entrypoints=web, websecure"
+      - "traefik.http.routers.whoami.tls=true"
+      - "traefik.http.routers.whoami.tls.certresolver=production"
+      - "traefik.docker.network=traefik_network"
+
+networks:
+  traefik_network:
+    external: true

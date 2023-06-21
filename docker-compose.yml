@@ -47,7 +47,6 @@ services:
       - mysqldb
     environment:
       - PMA_HOST=mysql-db
-      # - PMA_ABSOLUTE_URI=https://pma.localhost/
     networks:
       - private-network
 

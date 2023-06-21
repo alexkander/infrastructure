@@ -1,0 +1,25 @@
+sudo yum update
+sudo yum search docker
+sudo yum install docker
+sudo usermod -a -G docker ec2-user
+id ec2-user
+sudo systemctl enable docker.service
+sudo systemctl start docker.service
+sudo systemctl status docker.service
+
+docker swarm init
+docker network create --driver overlay private-network
+
+# https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ebs-using-volumes.html
+
+sudo mkdir /data
+sudo mount /dev/xvdf /data
+
+sudo cp /etc/fstab /etc/fstab.orig
+
+sudo blkid
+sudo lsblk -o +UUID
+
+sudo vim /etc/fstab
+
+# UUID=730280f4-f7cd-46d5-8011-5aa35f4feb11  /data  xfs  defaults,nofail  0  2

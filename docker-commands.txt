@@ -1,0 +1,26 @@
+aws ecr --profile power-dev create-repository --repository-name hello-repository --image-scanning-configuration scanOnPush=true --region us-east-1
+
+docker tag hello-world:latest 260454124697.dkr.ecr.us-east-1.amazonaws.com/hello-repository
+
+docker push 260454124697.dkr.ecr.us-east-1.amazonaws.com/hello-repository
+
+docker pull 260454124697.dkr.ecr.us-east-1.amazonaws.com/hello-repository:latest
+
+aws ecr --profile power-dev get-login-password --region us-east-1 | docker login --username AWS --password-stdin 260454124697.dkr.ecr.us-east-1.amazonaws.com
+
+echo TOKEN | docker login --username AWS --password-stdin 260454124697.dkr.ecr.us-east-1.amazonaws.com
+
+sudo mkdir -p /data/docker-volumes/alexkander_infrastructure/
+sudo chown -R ec2-user:ec2-user /data/docker-volumes/alexkander_infrastructure/
+sudo chmod -R 0755 /data/docker-volumes/alexkander_infrastructure/
+mkdir -p ~/alexkander_infrastructure/traefik/
+mkdir -p ~/alexkander_infrastructure/traefik/acme
+mkdir -p ~/alexkander_infrastructure/mysqldb/
+mkdir -p ~/alexkander_infrastructure/_traefik-history
+mkdir -p ~/alexkander_infrastructure/_docker-stack-history
+
+ssh -o StrictHostKeyChecking=no -i "../alex-main.pem" -p 22 ec2-user@alexkander.xyz docker stack rm alexkander_infrastructure
+scp -o StrictHostKeyChecking=no -i "../alex-main.pem" -P 22 -v -r traefik.yml ec2-user@alexkander.xyz:/home/ec2-user/traefik.yml
+scp -o StrictHostKeyChecking=no -i "../alex-main.pem" -P 22 -v -r docker-stack.yml ec2-user@alexkander.xyz:/home/ec2-user/docker-stack-test.yml
+ssh -o StrictHostKeyChecking=no -i "../alex-main.pem" -p 22 ec2-user@alexkander.xyz docker stack deploy --prune -c /home/ec2-user/docker-stack-test.yml --with-registry-auth alexkander_infrastructure
+  

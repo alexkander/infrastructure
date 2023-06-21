@@ -1,0 +1,42 @@
+## traefik.yml
+
+# Docker configuration backend
+providers:
+  docker:
+    # swarmMode: true
+    exposedByDefault: false
+    defaultRule: "Host(`{{ trimPrefix `/` .Name }}.docker.localhost`)"
+
+api:
+  insecure: true
+  dashboard: true
+
+entryPoints:
+  web:
+    address: ":80"
+    # (Optional) Redirect to HTTPS
+    http:
+      redirections:
+        entryPoint:
+          to: websecure
+          scheme: https
+
+  websecure:
+    address: :443
+
+certificatesResolvers:
+  staging:
+    acme:
+      email: arondn2@gmail.com
+      storage: /acme/acme.json
+      caServer: "https://acme-staging-v02.api.letsencrypt.org/directory"
+      httpChallenge:
+        entryPoint: web
+
+  production:
+    acme:
+      email: arondn2@gmail.com
+      storage: /acme/acme.json
+      caServer: "https://acme-v02.api.letsencrypt.org/directory"
+      httpChallenge:
+        entryPoint: web
