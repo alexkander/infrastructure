@@ -13,6 +13,7 @@ env:
   SSH_KEY: ${{ secrets.SSH_KEY }}
   SSH_TARGET: ec2-user@alexkander.xyz
   SSH_DIRECTORY: "/home/ec2-user"
+  DB_PASS: ${{ secrets.DB_PASS }}
 
 jobs:
   build:
@@ -34,7 +35,7 @@ jobs:
 
       - name: Docker Stack Deploy
         env:
-          STACK_ENV: "REPO_DIR=${{ env.REPO_DIR }}"
+          STACK_ENV: "REPO_DIR=${{ env.REPO_DIR }} DB_PASS=${{ env.DB_PASS }}"
         run: |
           echo -e "$SSH_KEY" > __TEMP_KEY_FILE
           chmod 600 __TEMP_KEY_FILE
