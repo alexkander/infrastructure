@@ -51,18 +51,6 @@ services:
       - "traefik.http.routers.phpmyadminClient.tls.certresolver=production"
       - "traefik.docker.network=traefik_network"
 
-  whoami:
-    image: containous/whoami
-    networks:
-      - traefik_network
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.whoami.rule=Host(`whoami.alexkander.xyz`)"
-      - "traefik.http.routers.whoami.entrypoints=web, websecure"
-      - "traefik.http.routers.whoami.tls=true"
-      - "traefik.http.routers.whoami.tls.certresolver=production"
-      - "traefik.docker.network=traefik_network"
-
 networks:
   traefik_network:
     external: true
