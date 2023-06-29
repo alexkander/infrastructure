@@ -13,9 +13,10 @@ echo TOKEN | docker login --username AWS --password-stdin 260454124697.dkr.ecr.u
 sudo mkdir -p /data/docker-volumes/alexkander_infrastructure/
 sudo chown -R ec2-user:ec2-user /data/docker-volumes/alexkander_infrastructure/
 sudo chmod -R 0755 /data/docker-volumes/alexkander_infrastructure/
+ln -s /data/docker-volumes/alexkander_infrastructure/ ~/alexkander_infrastructure
 mkdir -p ~/alexkander_infrastructure/traefik/
 mkdir -p ~/alexkander_infrastructure/traefik/acme
-mkdir -p ~/alexkander_infrastructure/mysqldb/
+mkdir -p ~/alexkander_infrastructure/mysqldb/data
 mkdir -p ~/alexkander_infrastructure/_traefik-history
 mkdir -p ~/alexkander_infrastructure/_docker-stack-history
 

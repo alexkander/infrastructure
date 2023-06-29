@@ -31,8 +31,6 @@ services:
       - "$REPO_DIR/mysqldb/data:/var/lib/mysql"
     networks:
       - traefik_network
-    labels:
-      - "traefik.enable=false"
 
   phpmyadminClient:
     image: phpmyadmin/phpmyadmin:4.7

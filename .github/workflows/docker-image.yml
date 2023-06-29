@@ -11,10 +11,8 @@ permissions:
 env:
   AWS_REGION: us-east-1
   SSH_KEY: ${{ secrets.SSH_KEY }}
-  SSH_PORT: 22
   SSH_TARGET: ec2-user@alexkander.xyz
   SSH_DIRECTORY: "/home/ec2-user"
-  RUN_TAG: "${{ github.run_number }}.${{ github.run_attempt }}"
 
 jobs:
   build:
@@ -26,30 +24,13 @@ jobs:
       - name: Set Env
         run: |
           REPO_NAME=${GITHUB_REPOSITORY//\//_}
-          echo "IMAGE_TAG=$RUN_TAG-${GITHUB_SHA::8}" >> $GITHUB_ENV
+          RUN_TAG="${{ github.run_number }}.${{ github.run_attempt }}"
+
+          echo "RUN_TAG=$RUN_TAG" >> $GITHUB_ENV
           echo "REPO_NAME=$REPO_NAME" >> $GITHUB_ENV
+
+          echo "IMAGE_TAG=$RUN_TAG-${GITHUB_SHA::8}" >> $GITHUB_ENV
           echo "REPO_DIR=$SSH_DIRECTORY/$REPO_NAME" >> $GITHUB_ENV
-
-      # - name: Configure AWS credentials
-      #   uses: aws-actions/configure-aws-credentials@v1
-      #   with:
-      #     role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-      #     role-session-name: GitHub_to_AWS_via_FederatedOIDC
-      #     aws-region: ${{ env.AWS_REGION }}
-
-      # - name: Login to Amazon ECR
-      #   id: login-ecr
-      #   uses: aws-actions/amazon-ecr-login@v1
-
-      # - name: "Ngix: Build, tag, and push image to Amazon ECR"
-      #   id: build-nginx-docker
-      #   env:
-      #     ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-      #     ECR_REPOSITORY: ${{ github.repository }}
-      #   run: |
-      #     docker build -t ${ECR_REGISTRY}/${ECR_REPOSITORY}-nginx:$IMAGE_TAG ./nginx
-      #     docker push ${ECR_REGISTRY}/${ECR_REPOSITORY}-nginx:$IMAGE_TAG
-      #     echo "image=${ECR_REGISTRY}/${ECR_REPOSITORY}-nginx:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
       - name: Docker Stack Deploy
         env:
@@ -58,9 +39,9 @@ jobs:
           echo -e "$SSH_KEY" > __TEMP_KEY_FILE
           chmod 600 __TEMP_KEY_FILE
           scp -o StrictHostKeyChecking=no -i __TEMP_KEY_FILE -P 22 -v -r docker-stack.yml "$SSH_TARGET:$REPO_DIR/docker-stack.yml"
-          scp -o StrictHostKeyChecking=no -i __TEMP_KEY_FILE -P 22 -v -r traefik.yml "$SSH_TARGET:$REPO_DIR/traefik.yml"
-
           scp -o StrictHostKeyChecking=no -i __TEMP_KEY_FILE -P 22 -v -r docker-stack.yml "$SSH_TARGET:$REPO_DIR/_docker-stack-history/docker-stack-$IMAGE_TAG.yml"
+
+          scp -o StrictHostKeyChecking=no -i __TEMP_KEY_FILE -P 22 -v -r traefik.yml "$SSH_TARGET:$REPO_DIR/traefik.yml"
           scp -o StrictHostKeyChecking=no -i __TEMP_KEY_FILE -P 22 -v -r traefik.yml "$SSH_TARGET:$REPO_DIR/_traefik-history/traefik-$IMAGE_TAG.yml"
 
           ssh -o StrictHostKeyChecking=no -i __TEMP_KEY_FILE -p 22 $SSH_TARGET env $STACK_ENV docker stack deploy --prune -c "$REPO_DIR/docker-stack.yml" --with-registry-auth $REPO_NAME
